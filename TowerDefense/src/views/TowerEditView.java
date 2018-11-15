@@ -8,9 +8,9 @@ import javax.swing.JFrame;
 
 public class TowerEditView {
 	
-	JFrame frame;
-	JComboBox<String> comboBox;
-	JButton confirmBtn;
+	private JFrame frame;
+	private JComboBox<String> comboBox;
+	private JButton confirmBtn;
 	
 	public TowerEditView() {
 		frame = new JFrame("Upgrade Tower");

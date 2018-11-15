@@ -1,10 +1,14 @@
 package models;
 
+import java.awt.Dimension;
+import java.awt.Point;
+
 public class PlainProjectile extends Projectile {
 
-	public PlainProjectile(float x, float y, float speed, Enemy target) {
-		setX(x);
-		setY(y);
+	private static final int DAMAGE = 10;
+	
+	public PlainProjectile(Point.Double location, double speed, Enemy target, Dimension dimension) {
+		super(location, dimension, speed);
 		setSpeed(speed);
 		setTarget(target);
 		setExploded(false);
@@ -12,14 +16,13 @@ public class PlainProjectile extends Projectile {
 
 	@Override
 	public void explode() {
-		System.out.println("normal explosion");
-		getTarget().applyDamage(10);
+		getTarget().applyDamage(DAMAGE);
 		setExploded(true);
 	}
 
 	@Override
 	public Projectile clone() {
-		return new PlainProjectile(getX(), getY(), getSpeed(), getTarget());
+		return new PlainProjectile(getLocation(), getSpeed(), getTarget(), getDimension());
 	}
 
 

@@ -1,12 +1,9 @@
 package views;
 
 import java.awt.BorderLayout;
-import java.awt.Canvas;
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.GridLayout;
-import java.awt.Point;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import javax.swing.JButton;
@@ -15,6 +12,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 import models.Enemy;
+import models.GameRectangle;
+import models.PotentialTower;
 import models.Tower;
 
 public class View {
@@ -25,14 +24,12 @@ public class View {
 
 	private GamePanel gamePanel;
 	private JPanel controlPanel;
-
-	private Canvas canvas;
-
-	private Graphics graphics;
+	private JPanel topPanel;
 
 	private JLabel currencyLbl;
 	private JLabel timeLbl;
 	private JLabel scoreLbl;
+	private JLabel livesLbl;
 
 	private int width;
 	private int height;
@@ -49,14 +46,22 @@ public class View {
 
 		currencyLbl = new JLabel("0", JLabel.CENTER);
 		timeLbl = new JLabel("00:00", JLabel.CENTER);
+		
+		
 		scoreLbl = new JLabel("Score: 0", JLabel.CENTER);
-
+		livesLbl = new JLabel("Lives: " , JLabel.RIGHT);
+		
 		pauseBtn = new JButton("Pause");
 		buyTowerBtn = new JButton("Buy Tower");
 
 		gamePanel = new GamePanel(width, height);
 		controlPanel = new JPanel();
-
+		topPanel = new JPanel();
+		
+		topPanel.setLayout(new BorderLayout());
+		topPanel.add(scoreLbl, BorderLayout.CENTER);
+		topPanel.add(livesLbl, BorderLayout.EAST);
+		
 		controlPanel.setLayout(new GridLayout(2, 3));
 		controlPanel.add(timeLbl);
 		controlPanel.add(pauseBtn);
@@ -65,7 +70,7 @@ public class View {
 		controlPanel.add(currencyLbl);
 		controlPanel.add(new JPanel());
 
-		frame.add(scoreLbl, BorderLayout.NORTH);
+		frame.add(topPanel, BorderLayout.NORTH);
 		frame.add(gamePanel, BorderLayout.CENTER);
 		frame.add(controlPanel, BorderLayout.SOUTH);
 
@@ -79,10 +84,6 @@ public class View {
 
 	public JButton getBuyTowerBtn() {
 		return buyTowerBtn;
-	}
-
-	public void drawMap(ArrayList<Point> path) {
-		gamePanel.drawMap(path);
 	}
 
 	public JLabel getCurrencyLbl() {
@@ -107,26 +108,9 @@ public class View {
 		timeLbl.setText(TimeUnit.MILLISECONDS.toMinutes(millis) + ":" + TimeUnit.MILLISECONDS.toSeconds(millis));
 	}
 	
-	public void drawPotentialTower(Point point, Color c) {
-		gamePanel.drawPotentialTower(point, c);
-		
-	}
-
-	public void drawTowers(ArrayList<Tower> towers) {
-		for(Tower t : towers) {
-			gamePanel.drawTower(t);
-		}
-		
-		gamePanel.repaint();
-		
-	}
-
-	public void drawEnemies(ArrayList<Enemy> enemies) {
-		for(Enemy e : enemies) {
-			gamePanel.drawEnemy(e);
-		}
-		
-		gamePanel.repaint();
+	public void draw(List<GameRectangle> path, ArrayList<Enemy> enemies, ArrayList<Tower> towers, 
+			PotentialTower potentialTower){
+		gamePanel.draw(path, enemies, towers, potentialTower);
 	}
 
 	public void setCurrency(float currency) {
@@ -136,5 +120,9 @@ public class View {
 
 	public void setScore(float score) {
 		scoreLbl.setText(""+score);
+	}
+
+	public void setLives(int lives) {
+		livesLbl.setText("Lives: " + lives);
 	}
 }

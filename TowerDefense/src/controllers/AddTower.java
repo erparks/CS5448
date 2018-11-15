@@ -16,14 +16,14 @@ public class AddTower implements Command {
 	@Override
 	public void execute() {
 		model.addTower(tower);
-		model.spendCurrency(model.getTowerCost());
+		model.addCurrency(-Model.TOWER_COST);
 	}
 
 	@Override
 	public void undo() {
 		tower.getProjectiles().clear();
 		model.removeTower(tower);
-		model.addCurrency(model.getTowerCost());
+		model.addCurrency(Model.TOWER_COST);
 	}
 
 }

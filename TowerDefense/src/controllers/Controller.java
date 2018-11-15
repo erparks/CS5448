@@ -1,6 +1,7 @@
 package controllers;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -12,21 +13,25 @@ import java.awt.event.MouseMotionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.Timer;
 
+import models.AirEnemy;
 import models.Enemy;
+import models.EnemyFactory;
+import models.GameRectangle;
 import models.Model;
+import models.PotentialTower;
 import models.Tower;
-import views.TowerEditView;
 import views.View;
 
 public class Controller implements ActionListener, MouseMotionListener, MouseListener, KeyListener {
 
+	private static long DELTA_T = 10;
+	
 	private boolean isPlaying;
 	private boolean isPlacingTower;
-	private long deltaT;
+	private boolean gameOver;
 
 	private Point mouseLocation;
 
@@ -36,34 +41,17 @@ public class Controller implements ActionListener, MouseMotionListener, MouseLis
 	private UserCommands userCommands;
 
 	public Controller() {
-		this.model = new Model();
-		this.view = new View();
+		model = new Model();
+		view = new View();
 
 		userCommands = new UserCommands();
 
-		deltaT = 10;
+		new InputController(model);
 
-		// Spin thread to listen for user input
-//		Thread inputThread = new Thread(new Runnable() {
-//
-//			public void run() {
-//
-//				Scanner input = new Scanner(System.in);
-//				String userInput;
-//				while (!(userInput = input.next()).equals("Exit")) {
-//					System.out.println("you said " + userInput);
-//
-//				}
-//
-//				System.exit(0);
-//			}
-//		});
-//
-//		inputThread.start();
+		isPlaying = true;
 	}
 
 	public void control(String mapFileLocation) {
-		System.out.println("Control");
 
 		view.getBuyTowerBtn().addActionListener(this);
 		view.getBuyTowerBtn().addKeyListener(this);
@@ -76,42 +64,56 @@ public class Controller implements ActionListener, MouseMotionListener, MouseLis
 		initMap(mapFileLocation);
 
 		Timer timerObj = new Timer(true);
-		timerObj.scheduleAtFixedRate(new TimeController(this), 0, deltaT);
+		timerObj.scheduleAtFixedRate(new TimeController(this), 0, DELTA_T);
 	}
 
 	protected void update() {
-		if (model.getTime() % 10000.0 == 0) {
-			System.out.println("Spawn enemy");
-			spawnEnemies();
+
+		if (!isPlaying)
+			return;
+
+		if (model.getLives() == 0) {
+			gameOver = true;
+			isPlaying = false;
+			new GameOverController(this);
 		}
-		model.update(deltaT);
+		
+		model.update(DELTA_T);
 
-		view.drawMap(model.getPath());
-		view.drawTowers(model.getTowers());
-		view.drawEnemies(model.getEnemies());
-
-		if (isPlacingTower) {
-			if (model.isValidTowerLocation(mouseLocation)) {
-				view.drawPotentialTower(mouseLocation, Color.GREEN);
-			} else {
-				view.drawPotentialTower(mouseLocation, Color.RED);
-			}
-
-		}
+		view.draw(model.getPath(), model.getEnemies(), model.getTowers(), getPotentialTower(mouseLocation));
 
 		view.setTime(model.getTime());
 		view.setCurrency(model.getCurrency());
 		view.setScore(model.getScore());
+		view.setLives(model.getLives());
 	}
 
-	private void spawnEnemies() {
-		model.addEnemy(new Enemy(model.getPath(), 200, 0.5f, Float.MIN_VALUE, Float.MIN_VALUE, false));
+	public void reset() {
+		model.reset();
+		gameOver = false;
+		isPlaying = true;
+	}
+
+	private PotentialTower getPotentialTower(Point mouseLocation) {
+		if (!isPlacingTower)
+			return null;
+		if (mouseLocation == null)
+			return null;
+
+		PotentialTower potentialTower = new PotentialTower(
+				new Point.Double(mouseLocation.x - Model.TOWER_SIZE / 2, mouseLocation.y - Model.TOWER_SIZE / 2));
+
+		if (!model.isValidTowerLocation(potentialTower))
+			potentialTower.setColor(Color.RED);
+		else
+			potentialTower.setColor(Color.GREEN);
+
+		return potentialTower;
 	}
 
 	private void initMap(String mapFileLocation) {
 
 		BufferedReader br = null;
-		ArrayList<Point> path = new ArrayList<Point>();
 
 		try {
 			String line;
@@ -122,18 +124,17 @@ public class Controller implements ActionListener, MouseMotionListener, MouseLis
 				// use comma as separator
 				String[] pointValues = line.split(",");
 
-				path.add(new Point(Integer.parseInt(pointValues[0]), Integer.parseInt(pointValues[1])));
+				model.addPath(new GameRectangle(
+						new Point.Double(Integer.parseInt(pointValues[0]), Integer.parseInt(pointValues[1])),
+						new Dimension(Model.PATH_SIZE, Model.PATH_SIZE)));
 
 			}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} finally {
 			if (br != null) {
 				try {
 					br.close();
-					view.drawMap(path);
-					model.setPath(path);
 				} catch (IOException e) {
 					e.printStackTrace();
 				}
@@ -141,12 +142,18 @@ public class Controller implements ActionListener, MouseMotionListener, MouseLis
 		}
 	}
 
+	// This gives the upper left corner of the tower centered at the cursor.
+	private Point.Double getTowerLocationFromMouseLocation(Point mouselocation) {
+		return new Point.Double(mouseLocation.x - Model.TOWER_SIZE / 2, mouseLocation.y - Model.TOWER_SIZE / 2);
+	}
+
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		if (e.getSource() == view.getBuyTowerBtn() && model.getCurrency() >= model.getTowerCost()) {
+		if (e.getSource() == view.getBuyTowerBtn() && model.getCurrency() >= Model.TOWER_COST) {
 			isPlacingTower = true;
 		} else if (e.getSource() == view.getPauseBtn()) {
-			System.out.println("Pause game");
+			if (!gameOver)
+				isPlaying = !isPlaying;
 		}
 	}
 
@@ -159,17 +166,32 @@ public class Controller implements ActionListener, MouseMotionListener, MouseLis
 	public void mouseClicked(MouseEvent e) {
 		Tower clickedTower = null;
 
-		if (isPlacingTower && model.isValidTowerLocation(mouseLocation)) {
+		// If placing tower and valid location
+		if (isPlacingTower
+				&& model.isValidTowerLocation(new PotentialTower(getTowerLocationFromMouseLocation(e.getPoint())))) {
 
-			userCommands.executeCommand(new AddTower(new Tower(e.getPoint()), model));
+			userCommands
+					.executeCommand(new AddTower(new Tower(getTowerLocationFromMouseLocation(e.getPoint())), model));
 
-		} else if ((clickedTower = model.getClickedTower(mouseLocation)) != null) {
-			
-			new TowerEditController(clickedTower, userCommands);
-			
+		}
+
+		// If tower was clicked
+		else if ((clickedTower = model.getClickedTower(mouseLocation)) != null) {
+
+			new TowerEditController(clickedTower, model.getEnemies(), userCommands);
 		}
 
 		isPlacingTower = false;
+	}
+
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if ((e.getKeyCode() == KeyEvent.VK_Z) && (e.isControlDown())) {
+			userCommands.undo();
+		} else if ((e.getKeyCode() == KeyEvent.VK_Y) && (e.isControlDown())) {
+			userCommands.redo();
+		}
+
 	}
 
 	@Override
@@ -197,24 +219,11 @@ public class Controller implements ActionListener, MouseMotionListener, MouseLis
 
 	@Override
 	public void keyTyped(KeyEvent e) {
-		// TODO Auto-generated method stub
-
-	}
-
-	@Override
-	public void keyPressed(KeyEvent e) {
-		if ((e.getKeyCode() == KeyEvent.VK_Z) && (e.isControlDown())) {
-			System.out.println("Undo");
-			userCommands.undo();
-		} else if ((e.getKeyCode() == KeyEvent.VK_Y) && (e.isControlDown())) {
-			userCommands.redo();
-		}
 
 	}
 
 	@Override
 	public void keyReleased(KeyEvent e) {
-		// TODO Auto-generated method stub
 
 	}
 

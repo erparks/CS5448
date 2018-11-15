@@ -4,17 +4,20 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
-import models.Projectile;
 import models.Enemy;
+import models.GameRectangle;
+import models.Model;
+import models.PotentialTower;
+import models.Projectile;
 import models.Tower;
 
 public class GamePanel extends JPanel {
@@ -32,39 +35,93 @@ public class GamePanel extends JPanel {
 		this.width = width;
 		this.height = height;
 		this.tileSize = 64;
+
 		setPreferredSize(new Dimension(width, height));
 		setFocusable(true);
+		setDoubleBuffered(true);
+
 		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		imgG2 = img.createGraphics();
+
 		try {
 			System.out.println("Working Directory = " + System.getProperty("user.dir"));
 			backgroundTile = ImageIO.read(new File("./images/dirt.jpeg"));
 			pathTile = ImageIO.read(new File("./images/path.jpeg"));
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 
-	public void drawMap(ArrayList<Point> path) {
-		drawBackground();
-		drawPath(path);
+	public void draw(List<GameRectangle> path, ArrayList<Enemy> enemies, ArrayList<Tower> towers,
+			PotentialTower potentialTower) {
+		drawMap(path);
+		drawEnemies(enemies);
+		drawTowers(towers);
+		drawPotentialTower(potentialTower);
 
 		repaint();
 	}
 
-	private void drawPath(ArrayList<Point> path) {
-		for (Point p : path) {
-			imgG2.drawImage(pathTile, p.x-32, p.y-32, tileSize, tileSize, this);
+	private void drawMap(List<GameRectangle> path) {
+		drawBackground();
+		drawPath(path);
+	}
+
+	private void drawEnemies(ArrayList<Enemy> enemies) {
+		for (Enemy e : enemies) {
+			drawEnemy(e);
+		}
+	}
+
+	private void drawTowers(ArrayList<Tower> towers) {
+		for (Tower t : towers) {
+			drawTower(t);
+		}
+	}
+
+	private void drawPath(List<GameRectangle> path) {
+		for (GameRectangle pathRect : path) {
+			imgG2.drawImage(pathTile, (int) pathRect.getUpperLeft().x,
+					(int) pathRect.getUpperLeft().y, Model.PATH_SIZE, Model.PATH_SIZE, this);
 		}
 	}
 
 	private void drawBackground() {
 		for (int i = 0; i < width; i += tileSize) {
 			for (int j = 0; j < height; j += tileSize) {
-				imgG2.drawImage(backgroundTile, i, j, tileSize, tileSize, this);
+				imgG2.drawImage(backgroundTile, i, j, Model.PATH_SIZE, Model.PATH_SIZE, this);
 			}
 		}
+	}
+
+	private void drawPotentialTower(PotentialTower potentialTower) {
+
+		if (potentialTower == null)
+			return;
+
+		imgG2.setColor(potentialTower.getColor());
+
+		imgG2.drawRect((int) (potentialTower.getLocation().x),
+				(int) (potentialTower.getLocation().y), Model.TOWER_SIZE, Model.TOWER_SIZE);
+	}
+
+	private void drawTower(Tower t) {
+		imgG2.setColor(Color.WHITE);
+		imgG2.fillRect((int) (t.getLocation().x), (int) (t.getLocation().y), Model.TOWER_SIZE, Model.TOWER_SIZE);
+
+		imgG2.setColor(Color.BLUE);
+		for (Projectile bp : t.getProjectiles()) {
+			imgG2.fillOval((int) bp.getLocation().x, (int) bp.getLocation().y, Model.DEFAULT_PROJECTILE_SIZE,
+					Model.DEFAULT_PROJECTILE_SIZE);
+		}
+
+	}
+
+	private void drawEnemy(Enemy e) {
+		imgG2.setColor(e.getColor());
+		imgG2.fillOval((int) e.getLocation().x, (int) e.getLocation().y, (int) e.getDimension().getWidth(), (int) e.getDimension().getHeight());
+		imgG2.setColor(Color.BLACK);
+		imgG2.drawString("" + e.getHealth(), (int) e.getLocation().x, (int) e.getLocation().y - 10);
 	}
 
 	protected void paintComponent(Graphics g) {
@@ -73,31 +130,5 @@ public class GamePanel extends JPanel {
 		Graphics2D g2 = (Graphics2D) g.create();
 		g2.drawImage(img, 0, 0, width, height, null);
 	}
-
-	public void drawPotentialTower(Point point, Color c) {
-		imgG2.setColor(c);
-		imgG2.drawRect(point.x-32, point.y-32, 64, 64);
-		
-		repaint();
-	}
-
-	public void drawTower(Tower t) {
-		imgG2.setColor(Color.WHITE);
-		imgG2.fillRect(t.getLocation().x-32, t.getLocation().y-32, 64, 64);
-		
-		imgG2.setColor(Color.BLUE);
-		for(Projectile bp : t.getProjectiles()) {
-			imgG2.fillOval((int)bp.getX(), (int)bp.getY(), 5, 5);
-		}
-		
-	}
-
-	public void drawEnemy(Enemy e) {
-		imgG2.setColor(Color.RED);
-		imgG2.fillOval((int)e.getX(), (int)e.getY(), 10, 10);
-		imgG2.setColor(Color.BLACK);
-		imgG2.drawString(""+e.getHealth(), (int)e.getX(), (int)e.getY() - 10);
-	}
-	
 
 }

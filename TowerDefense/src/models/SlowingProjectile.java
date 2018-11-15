@@ -2,6 +2,8 @@ package models;
 
 public class SlowingProjectile extends ProjectileDecorator {
 
+	private static final double SLOW_SPEED = 0.5;
+	
 	public SlowingProjectile(Projectile projectile) {
 		super(projectile);
 	}
@@ -9,8 +11,7 @@ public class SlowingProjectile extends ProjectileDecorator {
 	public void explode() {
 
 		super.explode();
-		System.out.println("Slow explode: " + getTarget().getSpeed() * 0.75f);
-		getTarget().setSpeed(getTarget().getSpeed() * 0.75f);
+		getTarget().setSpeed(SLOW_SPEED);
 		setExploded(true);
 	}
 

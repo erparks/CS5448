@@ -1,53 +1,31 @@
 package models;
 
-import java.awt.geom.Point2D;
+import java.awt.Dimension;
+import java.awt.geom.Point2D.Float;
 
 public abstract class Projectile extends Mobile{
 
-	private float x;
-	private float y;
-	private float speed;
 	private Enemy target;
 	private boolean exploded;
 	
-	public abstract void explode();
-
-	public abstract Projectile clone();
-
-	@Override
-	public void updateLocation() {
-		double dist = Point2D.distance(getX(), getY(), getTarget().getX(), getTarget().getY());
-		
-		setLocation(stepLocation(getTarget().getX(), getTarget().getY(), getX(), getY(), getSpeed()));
-		
-		if (dist <= 5) {
-			explode();
-		}
+	public Projectile(Float.Double location, Dimension dimension, double speed) {
+		super(location, dimension, speed);
 	}
 	
-	public float getX() {
-		return x;
-	}
+	public abstract void explode();
+	public abstract Projectile clone();
 
-	public void setX(float x) {
-		this.x = x;
-	}
+	
+	@Override
+	public void updateLocation() {
 
-	public float getY() {
-		return y;
-	}
+		setLocation(stepLocation(getTarget().getLocation().x, getTarget().getLocation().y, getLocation().x, getLocation().y, getSpeed()));
 
-	public void setY(float y) {
-		this.y = y;
+		if(intersectsRectangle(getTarget())) 
+			explode();
+		
 	}
-
-	public float getSpeed() {
-		return speed;
-	}
-
-	public void setSpeed(float speed) {
-		this.speed = speed;
-	}
+	
 
 	public Enemy getTarget() {
 		return target;
@@ -55,12 +33,6 @@ public abstract class Projectile extends Mobile{
 
 	public void setTarget(Enemy target) {
 		this.target = target;
-	}
-
-	public void setLocation(Point2D.Float p) {
-		this.x = (float) p.getX();
-		this.y = (float) p.getY();
-
 	}
 
 	public boolean isExploded() {

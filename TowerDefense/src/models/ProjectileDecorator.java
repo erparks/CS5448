@@ -1,13 +1,14 @@
 package models;
 
+import java.awt.Dimension;
+
 public class ProjectileDecorator extends Projectile {
 
 	private Projectile projectile;
 
 	public ProjectileDecorator(Projectile projectile) {
+		super(projectile.getLocation(), projectile.getDimension(), projectile.getSpeed());
 		this.setProjectile(projectile);
-		setX(projectile.getX());
-		setY(projectile.getY());
 		setSpeed(projectile.getSpeed());
 		setTarget(projectile.getTarget());
 	}
