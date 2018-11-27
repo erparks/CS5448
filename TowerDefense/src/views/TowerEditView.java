@@ -6,12 +6,28 @@ import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JFrame;
 
+/**
+ * @author Ethan Parks
+ * View for the Tower Edit window.
+ */
 public class TowerEditView {
 	
+	/**
+	 * Frame for the Tower Edit window.
+	 */
 	private JFrame frame;
+	/**
+	 * Combobox for selecting the edit to be applied to the tower.
+	 */
 	private JComboBox<String> comboBox;
+	/**
+	 * Confirm button to apply the selected edit to the tower.
+	 */
 	private JButton confirmBtn;
 	
+	/**
+	 * Create a show frame for the Tower Edit window.
+	 */
 	public TowerEditView() {
 		frame = new JFrame("Upgrade Tower");
 		frame.setSize(200, 200);
@@ -31,27 +47,27 @@ public class TowerEditView {
 		
 	}
 
+	/**
+	 * Returns the frame for the Tower Edit window.
+	 * @return The frame for the Tower Edit window.
+	 */
 	public JFrame getFrame() {
 		return frame;
 	}
 
-	public void setFrame(JFrame frame) {
-		this.frame = frame;
-	}
-
+	/**
+	 * Returns the combobox from the Tower Edit window.
+	 * @return The combobox from the Tower Edit window.
+	 */
 	public JComboBox<String> getComboBox() {
 		return comboBox;
 	}
 
-	public void setComboBox(JComboBox<String> comboBox) {
-		this.comboBox = comboBox;
-	}
-
+	/**
+	 * Returns the confirm button from the Tower Edit window.
+	 * @return The confirm button from the Tower Edit window.
+	 */
 	public JButton getConfirmBtn() {
 		return confirmBtn;
-	}
-
-	public void setConfirmBtn(JButton confirmBtn) {
-		this.confirmBtn = confirmBtn;
 	}
 }
