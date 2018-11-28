@@ -23,10 +23,7 @@ public class Model implements Serializable {
 	 * Width and height of a path rectangle.
 	 */
 	public static final int PATH_SIZE = 64;
-	/**
-	 * Size of a projectile.
-	 */
-	public static final int DEFAULT_PROJECTILE_SIZE = 5;
+
 	/**
 	 * Currency cost of purchasing a tower.
 	 */
@@ -43,7 +40,7 @@ public class Model implements Serializable {
 	/**
 	 * Minimum time between enemy spawns
 	 */
-	private static final int SPAWN_SPEED = 500;
+	private static final int SPAWN_SPEED = 600;
 	/**
 	 * Time between waves spawning.
 	 */
@@ -164,7 +161,7 @@ public class Model implements Serializable {
 	 * Spawn the next enemy in the stack of enemies waiting to be spawned.
 	 * 
 	 * An enemy is only spawned if enough time has passed since the last one
-	 * spawened.
+	 * spawned.
 	 * 
 	 * A new wave is added to the stack of waiting enemies if enough time has passed
 	 * since the last wave.
@@ -175,7 +172,7 @@ public class Model implements Serializable {
 	private void spawnEnemies(List<Enemy> enemies, Stack<Enemy> enemiesToSpawn) {
 
 		if (time % TIME_BETWEEN_WAVES == 0) {
-			addUnspawnedEnemies(nextSpawn, WAVE_LENGTH);
+			addUnspawnedEnemies("ground", WAVE_LENGTH);
 
 			if (nextSpawn.equals("air"))
 				nextSpawn = "ground";

@@ -43,8 +43,17 @@ public class UpgradeTower implements Command {
 	 */
 	@Override
 	public void undo() {
-		System.out.println("Undoing tower upgrade");
 		tower.setProjectile(projectile.getProjectile());
 	}
-
 }
+
+
+
+
+
+
+
+
+
+
+

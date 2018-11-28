@@ -31,20 +31,11 @@ public class SlowingProjectile extends ProjectileDecorator {
 		setExploded(true);
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see models.ProjectileDecorator#clone()
-	 */
+
 	public SlowingProjectile clone() {
 		return new SlowingProjectile(getProjectile().clone());
 	}
 
-	/*
-	 * (non-Javadoc)
-	 * 
-	 * @see models.Projectile#setTarget(models.Enemy)
-	 */
 	public void setTarget(Enemy e) {
 		super.setTarget(e);
 		getProjectile().setTarget(e);

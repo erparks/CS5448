@@ -2,6 +2,7 @@ package views;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
@@ -72,6 +73,7 @@ public class GamePanel extends JPanel {
 
 		img = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		imgG2 = img.createGraphics();
+		imgG2.setFont(new Font("default", Font.BOLD, 20));
 
 		try {
 			System.out.println("Working Directory = " + System.getProperty("user.dir"));
@@ -185,8 +187,8 @@ public class GamePanel extends JPanel {
 
 		imgG2.setColor(Color.BLUE);
 		for (Projectile bp : t.getProjectiles()) {
-			imgG2.fillOval((int) bp.getLocation().x, (int) bp.getLocation().y, Model.DEFAULT_PROJECTILE_SIZE,
-					Model.DEFAULT_PROJECTILE_SIZE);
+			imgG2.fillOval((int) bp.getLocation().x, (int) bp.getLocation().y, Projectile.DEFAULT_PROJECTILE_SIZE,
+					Projectile.DEFAULT_PROJECTILE_SIZE);
 		}
 
 	}

@@ -48,7 +48,7 @@ public class Tower extends GameRectangle {
 
 		this.timeOfLastShoot = -this.SHOOT_COOLDOWN;
 		this.projectile = new PlainProjectile(getCenter(), 2.0, null,
-				new Dimension(Model.DEFAULT_PROJECTILE_SIZE, Model.DEFAULT_PROJECTILE_SIZE));
+				new Dimension(Projectile.DEFAULT_PROJECTILE_SIZE, Projectile.DEFAULT_PROJECTILE_SIZE));
 		this.projectiles = new ArrayList<Projectile>();
 	}
 

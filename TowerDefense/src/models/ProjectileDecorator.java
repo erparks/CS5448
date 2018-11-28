@@ -6,7 +6,7 @@ import java.awt.Dimension;
  * Concrete class for the projectile decorator design pattern.
  * @author Ethan Parks
  */
-public class ProjectileDecorator extends Projectile {
+public abstract class ProjectileDecorator extends Projectile {
 
 	/**
 	 * The base projectile
@@ -30,10 +30,6 @@ public class ProjectileDecorator extends Projectile {
 		getProjectile().explode();
 	}
 
-	@Override
-	public Projectile clone() {
-		return new ProjectileDecorator(this);
-	}
 
 	/**
 	 * Returns the base projectile.

@@ -10,6 +10,11 @@ import java.awt.geom.Point2D.Float;
 public abstract class Projectile extends Mobile {
 
 	/**
+	 * Size of a projectile.
+	 */
+	public static final int DEFAULT_PROJECTILE_SIZE = 5;
+	
+	/**
 	 * Enemy towards which the projectile moves.
 	 */
 	private Enemy target;
